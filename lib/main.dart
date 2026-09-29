@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/pokemon_list_screen.dart';
 
 void main() {
   runApp(const PokedexApp());
@@ -43,7 +44,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               const Text(
-                'Selamat datang di Poxedex',
+                'Selamat datang di PoxeDex',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -59,8 +60,9 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur daftar Pokemon belum aktif')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PokemonListScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

@@ -1,4 +1,4 @@
-name: pokedex
+name: PokeDex
 description: "Mini app pokemon data list"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -30,11 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.0
+  http: ^1.6.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.0
   cupertino_icons: ^1.0.8
+  cached_network_image: ^4.0.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
