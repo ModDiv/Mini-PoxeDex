@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/pokemon_summary.dart';
 import '../services/pokeapi_service.dart';
 import '../widgets/pokemon_card.dart';
+import '../widgets/pokedex_scaffold.dart';
+
 
 class PokemonListScreen extends StatefulWidget {
   const PokemonListScreen({super.key});
@@ -79,11 +81,18 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar Pokemon'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
+    void soon(String feature) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('$feature belum aktif')));
+    }
+
+    return PokedexScaffold(
+      pageTitle: 'Daftar Pokemon',
+      onSearchSubmitted: (q) => soon('Pencarian "$q"'),
+      onSortTap: () => soon('Sort'),
+      onTypesTap: () => soon('Filter type'),
+      onFavoritesTap: () => soon('Favorit'),
       body: _buildBody(),
     );
   }
@@ -122,7 +131,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
       child: GridView.builder(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: 12,
