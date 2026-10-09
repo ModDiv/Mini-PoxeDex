@@ -123,7 +123,7 @@ class _PokedexScaffoldState extends State<PokedexScaffold> {
                     key: const ValueKey('search-icon'),
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      tooltip: 'Cari',
+                      tooltip: 'Search',
                       icon: const Icon(Icons.search),
                       onPressed: _openSearch,
                     ),
@@ -204,7 +204,7 @@ class _PokedexScaffoldState extends State<PokedexScaffold> {
             borderSide: BorderSide.none,
           ),
           suffixIcon: IconButton(
-            tooltip: 'Tutup pencarian',
+            tooltip: 'Close search',
             icon: const Icon(Icons.close, size: 20),
             onPressed: _closeSearch,
           ),

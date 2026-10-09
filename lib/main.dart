@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens/home_screen.dart';
+import 'services/favorite_service.dart';
 
 void main() {
   runApp(const PokedexApp());

@@ -41,7 +41,7 @@ class ExpandableFab extends StatelessWidget {
           ),
         FloatingActionButton(
           heroTag: null,
-          tooltip: isOpen ? 'Tutup menu' : 'Buka menu',
+          tooltip: isOpen ? 'Close menu' : 'Open menu',
           backgroundColor: colors.primaryContainer,
           foregroundColor: colors.onPrimaryContainer,
           onPressed: onToggle,

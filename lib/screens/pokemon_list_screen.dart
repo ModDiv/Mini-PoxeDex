@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'pokemon_detail_screen.dart';
 
 import '../models/pokemon_summary.dart';
 import '../services/pokeapi_service.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokedex_scaffold.dart';
+
 
 
 class PokemonListScreen extends StatefulWidget {
@@ -64,7 +66,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = 'Gagal memuat Pokemon. Periksa koneksi internetmu.');
+      setState(() => _error = 'Failed to load Pokemon. Check your internet connection.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -88,11 +90,11 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
     }
 
     return PokedexScaffold(
-      pageTitle: 'Daftar Pokemon',
-      onSearchSubmitted: (q) => soon('Pencarian "$q"'),
+      pageTitle: 'Pokemon List',
+      onSearchSubmitted: (q) => soon('Search "$q"'),
       onSortTap: () => soon('Sort'),
-      onTypesTap: () => soon('Filter type'),
-      onFavoritesTap: () => soon('Favorit'),
+      onTypesTap: () => soon('Type Filter'),
+      onFavoritesTap: () => soon('Favorites'),
       body: _buildBody(),
     );
   }
@@ -118,7 +120,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
               FilledButton.icon(
                 onPressed: _loadMore,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Coba lagi'),
+                label: const Text('Try again'),
               ),
             ],
           ),
@@ -148,9 +150,11 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
           return PokemonCard(
             pokemon: pokemon,
             onTap: () {
-              // TODO: Navigator.push ke PokemonDetailScreen
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Detail ${pokemon.displayName} belum tersedia')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PokemonDetailScreen(summary: pokemon),
+                ),
               );
             },
           );
@@ -165,7 +169,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
         child: TextButton.icon(
           onPressed: _loadMore,
           icon: const Icon(Icons.refresh),
-          label: const Text('Coba lagi'),
+          label: const Text('Try again'),
         ),
       );
     }
