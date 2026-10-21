@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import 'screens/home_screen.dart';
-import 'services/favorite_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(const PokedexApp());
 }
 

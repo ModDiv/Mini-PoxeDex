@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../widgets/pokedex_scaffold.dart';
-import 'pokemon_list_screen.dart';
+import 'pokemon_list_screen.dart';      
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -41,6 +40,7 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 14, color: colors.onSurfaceVariant),
                 textAlign: TextAlign.center,
               ),
+              
               const SizedBox(height: 32),
               FilledButton.tonal(
                 onPressed: () {
@@ -59,6 +59,8 @@ class HomeScreen extends StatelessWidget {
                 ),
                 child: const Text('View Pokemon List'),
               ),
+
+              
             ],
           ),
         ),

@@ -95,6 +95,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
       onSortTap: () => soon('Sort'),
       onTypesTap: () => soon('Type Filter'),
       onFavoritesTap: () => soon('Favorites'),
+      
       body: _buildBody(),
     );
   }

@@ -16,7 +16,7 @@ class PokeApiService {
     int offset = 0,
   }) async {
     final uri = Uri.parse('$_baseUrl/pokemon?limit=$limit&offset=$offset');
-    final response = await http.get(uri).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri).timeout(const Duration(seconds: 15)); // Nama dan URL Pokemon
 
     if (response.statusCode != 200) {
       throw Exception('Failed to load data (code ${response.statusCode})');
@@ -34,8 +34,8 @@ class PokeApiService {
     if (cached != null) return cached;
 
     final responses = await Future.wait([
-      http.get(Uri.parse('$_baseUrl/pokemon/$id')),
-      http.get(Uri.parse('$_baseUrl/pokemon-species/$id')),
+      http.get(Uri.parse('$_baseUrl/pokemon/$id')), // Type, height, weight
+      http.get(Uri.parse('$_baseUrl/pokemon-species/$id')), // Deskripsi
     ]).timeout(const Duration(seconds: 15));
 
     for (final r in responses) {
@@ -52,3 +52,10 @@ class PokeApiService {
     return detail;
   }
 }
+
+//JSON Mentah
+	// https://pokeapi.co/api/v2/pokemon?limit=20&offset=0
+  // https://pokeapi.co/api/v2/pokemon/1
+  // https://pokeapi.co/api/v2/pokemon-species/1
+  // https://pokeapi.co/api/v2/type
+  // https://pokeapi.co/api/v2/type/grass
