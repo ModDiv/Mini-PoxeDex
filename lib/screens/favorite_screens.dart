@@ -22,6 +22,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   final _favorites = FavoriteService.instance;
 
   Map<int, PokemonSummary> _byId = {};
+  Map<int, String> _primaryTypes = {}; // id -> tipe utama, untuk warna kartu
   bool _loading = true;
   String? _error;
   String _query = '';
@@ -41,6 +42,12 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       final all = await _service.fetchAllPokemon();
       if (!mounted) return;
       setState(() => _byId = {for (final p in all) p.id: p});
+
+      // Warna kartu: kalau gagal, kartu tetap netral
+      try {
+        final types = await _service.fetchPrimaryTypes();
+        if (mounted) setState(() => _primaryTypes = types);
+      } catch (_) {}
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -139,6 +146,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 Positioned.fill(
                   child: PokemonCard(
                     pokemon: pokemon,
+                    type: _primaryTypes[pokemon.id],
                     useHero: false,
                     onTap: () {
                       Navigator.push(

@@ -47,6 +47,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
 
   List<PokemonSummary>? _all; // 1025 nama
   final Map<String, Set<int>> _typeIds = {}; // type -> ID Pokemon
+  Map<int, String> _primaryTypes = {}; // id -> tipe utama, untuk warna kartu
   bool _dataLoading = false;
   String? _dataError;
 
@@ -66,6 +67,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _loadMore();
+    _loadPrimaryTypes();
   }
 
   @override
@@ -116,6 +118,16 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
       _error = null;
     });
     await _loadMore();
+  }
+
+  Future<void> _loadPrimaryTypes() async {
+    try {
+      final types = await _service.fetchPrimaryTypes();
+      if (!mounted) return;
+      setState(() => _primaryTypes = types);
+    } catch (_) {
+      // Gagal: kartu tetap berwarna netral, tidak mengganggu fitur lain
+    }
   }
 
   // ---------- Data untuk mode "semua" (search, sort, filter) ----------
@@ -289,6 +301,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
         Positioned.fill(
           child: PokemonCard(
             pokemon: pokemon,
+            type: _primaryTypes[pokemon.id],
             onTap: () {
               Navigator.push(
                 context,

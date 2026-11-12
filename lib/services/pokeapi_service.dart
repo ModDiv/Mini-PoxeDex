@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/pokemon_detail.dart';
 import '../models/pokemon_summary.dart';
+import '../utils/type_icons.dart';
 
 class PokeApiService {
   static const _baseUrl = 'https://pokeapi.co/api/v2';
@@ -12,8 +13,12 @@ class PokeApiService {
   // static: dipakai bersama, jadi data yang sama tidak diminta ulang
   static final Map<int, PokemonDetail> _detailCache = {};
   static List<PokemonSummary>? _allCache;
-  static List<String>? _typesCache;
   static final Map<String, Set<int>> _typeIdsCache = {};
+  static Map<int, String>? _primaryTypesCache;
+  static Future<Map<int, String>>? _primaryTypesFuture;
+
+  static int _idFromUrl(String url) =>
+      int.parse(Uri.parse(url).pathSegments.where((s) => s.isNotEmpty).last);
 
   /// Daftar Pokemon per halaman (name + url saja).
   Future<List<PokemonSummary>> fetchPokemonList({
@@ -79,27 +84,6 @@ class PokeApiService {
     return all;
   }
 
-  /// Daftar nama type (/type). "unknown" dan "stellar" disembunyikan.
-  Future<List<String>> fetchTypes() async {
-    final cached = _typesCache;
-    if (cached != null) return cached;
-
-    final uri = Uri.parse('$_baseUrl/type?limit=100');
-    final response = await http.get(uri).timeout(const Duration(seconds: 15));
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load types (code ${response.statusCode})');
-    }
-
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final types = (data['results'] as List<dynamic>)
-        .map((e) => (e as Map<String, dynamic>)['name'] as String)
-        .where((n) => n != 'unknown' && n != 'stellar')
-        .toList();
-    _typesCache = types;
-    return types;
-  }
-
   /// ID Pokemon (1-1025) yang memiliki [type] (/type/{nama}).
   Future<Set<int>> fetchPokemonIdsByType(String type) async {
     final cached = _typeIdsCache[type];
@@ -116,13 +100,43 @@ class PokeApiService {
     final ids = <int>{};
     for (final e in data['pokemon'] as List<dynamic>) {
       // bentuk elemen: { "slot": 1, "pokemon": { "name": ..., "url": ... } }
-      final url = (e as Map<String, dynamic>)['pokemon']['url'] as String;
-      final segments =
-      Uri.parse(url).pathSegments.where((s) => s.isNotEmpty);
-      final id = int.parse(segments.last);
+      final id = _idFromUrl((e as Map<String, dynamic>)['pokemon']['url'] as String);
       if (id <= _maxId) ids.add(id); // buang varian (ID 10001+)
     }
     _typeIdsCache[type] = ids;
     return ids;
+  }
+
+  /// Peta ID Pokemon (1-1025) -> tipe utama. Memanggil 18 endpoint /type/{nama}
+  /// sekali (paralel), lalu dicache. Di /type/{nama}, slot 1 = tipe utama.
+  Future<Map<int, String>> fetchPrimaryTypes() {
+    final cached = _primaryTypesCache;
+    if (cached != null) return Future.value(cached);
+    return _primaryTypesFuture ??= _loadPrimaryTypes().whenComplete(() {
+      _primaryTypesFuture = null; // jika gagal, boleh dicoba lagi
+    });
+  }
+
+  Future<Map<int, String>> _loadPrimaryTypes() async {
+    final responses = await Future.wait(
+      TypeIcons.all.map((t) => http.get(Uri.parse('$_baseUrl/type/$t'))),
+    ).timeout(const Duration(seconds: 30));
+
+    final result = <int, String>{};
+    for (var i = 0; i < responses.length; i++) {
+      final r = responses[i];
+      if (r.statusCode != 200) {
+        throw Exception('Failed to load types (code ${r.statusCode})');
+      }
+      final data = jsonDecode(r.body) as Map<String, dynamic>;
+      for (final e in data['pokemon'] as List<dynamic>) {
+        final entry = e as Map<String, dynamic>;
+        if (entry['slot'] != 1) continue; // hanya tipe utama
+        final id = _idFromUrl(entry['pokemon']['url'] as String);
+        if (id <= _maxId) result[id] = TypeIcons.all[i];
+      }
+    }
+    _primaryTypesCache = result;
+    return result;
   }
 }

@@ -2,22 +2,32 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../models/pokemon_summary.dart';
+import '../utils/type_colors.dart';
 
 class PokemonCard extends StatelessWidget {
   final PokemonSummary pokemon;
   final VoidCallback? onTap;
   final bool useHero;
 
+  /// Tipe utama (mis. "fire"). Null = warna netral.
+  final String? type;
+
   const PokemonCard({
     super.key,
     required this.pokemon,
     this.onTap,
     this.useHero = true,
+    this.type,
   });
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+
+    final neutral = colors.surfaceContainerHighest;
+    final background = type == null
+        ? neutral
+        : Color.alphaBlend(TypeColors.of(type!).withAlpha(95), colors.surface);
 
     final image = CachedNetworkImage(
       imageUrl: pokemon.imageUrl,
@@ -36,43 +46,49 @@ class PokemonCard extends StatelessWidget {
       ),
     );
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      color: colors.surfaceContainerHighest,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  pokemon.displayId,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: colors.onSurfaceVariant,
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(end: background),
+      duration: const Duration(milliseconds: 400),
+      builder: (context, color, _) {
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          color: color,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      pokemon.displayId,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
                   ),
-                ),
+                  Expanded(
+                    child: useHero
+                        ? Hero(tag: 'pokemon-${pokemon.id}', child: image)
+                        : image,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    pokemon.displayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: useHero
-                    ? Hero(tag: 'pokemon-${pokemon.id}', child: image)
-                    : image,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                pokemon.displayName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
