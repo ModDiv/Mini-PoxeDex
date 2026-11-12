@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/pokedex_scaffold.dart';
-import 'pokemon_list_screen.dart';      
+import 'pokemon_list_screen.dart';
+import 'favorite_screens.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,12 @@ class HomeScreen extends StatelessWidget {
       onSearchSubmitted: (q) => _soon(context, 'Search "$q"'),
       onSortTap: () => _soon(context, 'Sort'),
       onTypesTap: () => _soon(context, 'Type Filter'),
-      onFavoritesTap: () => _soon(context, 'Favorites'),
+      onFavoritesTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoriteScreen()),
+        );
+      },
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

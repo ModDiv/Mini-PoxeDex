@@ -8,15 +8,17 @@ import '../models/pokemon_summary.dart';
 class PokeApiService {
   static const _baseUrl = 'https://pokeapi.co/api/v2';
 
-  // static: dipakai bersama, jadi membuka Pokemon yang sama tidak request ulang
+  // static: dipakai bersama, jadi data yang sama tidak diminta ulang
   static final Map<int, PokemonDetail> _detailCache = {};
+  static List<PokemonSummary>? _allCache;
 
+  /// Daftar Pokemon per halaman (name + url saja).
   Future<List<PokemonSummary>> fetchPokemonList({
     int limit = 20,
     int offset = 0,
   }) async {
     final uri = Uri.parse('$_baseUrl/pokemon?limit=$limit&offset=$offset');
-    final response = await http.get(uri).timeout(const Duration(seconds: 15)); // Nama dan URL Pokemon
+    final response = await http.get(uri).timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to load data (code ${response.statusCode})');
@@ -29,13 +31,15 @@ class PokeApiService {
         .toList();
   }
 
+  /// Detail satu Pokemon: type, height, weight (/pokemon/{id})
+  /// dan deskripsi (/pokemon-species/{id}), diambil paralel.
   Future<PokemonDetail> fetchPokemonDetail(int id) async {
     final cached = _detailCache[id];
     if (cached != null) return cached;
 
     final responses = await Future.wait([
-      http.get(Uri.parse('$_baseUrl/pokemon/$id')), // Type, height, weight
-      http.get(Uri.parse('$_baseUrl/pokemon-species/$id')), // Deskripsi
+      http.get(Uri.parse('$_baseUrl/pokemon/$id')),
+      http.get(Uri.parse('$_baseUrl/pokemon-species/$id')),
     ]).timeout(const Duration(seconds: 15));
 
     for (final r in responses) {
@@ -51,11 +55,32 @@ class PokeApiService {
     _detailCache[id] = detail;
     return detail;
   }
+
+  /// Semua Pokemon nomor 1-1025 (name + id saja). Dicache setelah pertama kali.
+  /// Dipakai halaman Favorites (dan nanti untuk pencarian).
+  Future<List<PokemonSummary>> fetchAllPokemon() async {
+    final cached = _allCache;
+    if (cached != null) return cached;
+
+    final uri = Uri.parse('$_baseUrl/pokemon?limit=1025&offset=0');
+    final response = await http.get(uri).timeout(const Duration(seconds: 20));
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load data (code ${response.statusCode})');
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final all = (data['results'] as List<dynamic>)
+        .map((e) => PokemonSummary.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _allCache = all;
+    return all;
+  }
 }
 
-//JSON Mentah
-	// https://pokeapi.co/api/v2/pokemon?limit=20&offset=0
-  // https://pokeapi.co/api/v2/pokemon/1
-  // https://pokeapi.co/api/v2/pokemon-species/1
-  // https://pokeapi.co/api/v2/type
-  // https://pokeapi.co/api/v2/type/grass
+// JSON mentah untuk referensi:
+// https://pokeapi.co/api/v2/pokemon?limit=20&offset=0
+// https://pokeapi.co/api/v2/pokemon/1
+// https://pokeapi.co/api/v2/pokemon-species/1
+// https://pokeapi.co/api/v2/type
+// https://pokeapi.co/api/v2/type/grass

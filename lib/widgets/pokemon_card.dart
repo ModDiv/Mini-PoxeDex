@@ -6,12 +6,35 @@ import '../models/pokemon_summary.dart';
 class PokemonCard extends StatelessWidget {
   final PokemonSummary pokemon;
   final VoidCallback? onTap;
+  final bool useHero;
 
-  const PokemonCard({super.key, required this.pokemon, this.onTap});
+  const PokemonCard({
+    super.key,
+    required this.pokemon,
+    this.onTap,
+    this.useHero = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+
+    final image = CachedNetworkImage(
+      imageUrl: pokemon.imageUrl,
+      fit: BoxFit.contain,
+      placeholder: (_, __) => const Center(
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      errorWidget: (_, __, ___) => Icon(
+        Icons.catching_pokemon,
+        size: 48,
+        color: colors.outline,
+      ),
+    );
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -33,25 +56,9 @@ class PokemonCard extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Hero(
-                  tag: 'pokemon-${pokemon.id}',
-                  child: CachedNetworkImage(
-                    imageUrl: pokemon.imageUrl,
-                    fit: BoxFit.contain,
-                    placeholder: (_, __) => const Center(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    errorWidget: (_, __, ___) => Icon(
-                      Icons.catching_pokemon,
-                      size: 48,
-                      color: colors.outline,
-                    ),
-                  ),
-                ),
+                child: useHero
+                    ? Hero(tag: 'pokemon-${pokemon.id}', child: image)
+                    : image,
               ),
               const SizedBox(height: 8),
               Text(

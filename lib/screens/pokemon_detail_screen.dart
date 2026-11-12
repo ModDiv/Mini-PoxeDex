@@ -7,6 +7,7 @@ import '../services/favorite_service.dart';
 import '../services/pokeapi_service.dart';
 import '../utils/type_colors.dart';
 import '../widgets/rotating_pokeball.dart';
+import '../widgets/confirm_remove_dialog.dart';
 
 class PokemonDetailScreen extends StatefulWidget {
   final PokemonSummary summary;
@@ -58,8 +59,8 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
     final id = widget.summary.id;
 
     if (_favorites.isFavorite(id)) {
-      final confirmed = await _confirmRemove();
-      if (confirmed != true) return;
+      final confirmed = await confirmRemoveFavorite(context);
+      if (!confirmed) return;
       await _favorites.remove(id);
       _showMessage('Removed from favorites');
     } else {
