@@ -55,7 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _error = 'Failed to load today\'s Pokemon. Check your internet connection.';
+        _error =
+        'Failed to load today\'s Pokemon. Check your internet connection.';
       });
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -98,29 +99,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final colors = Theme.of(context).colorScheme;
 
     return PokedexScaffold(
-      pageTitle: 'Home',
-      onSearchSubmitted: (q) => _soon('Search "$q"'),
-      onSortTap: () => _soon('Sort'),
-      onTypesTap: () => _soon('Type filter'),
-      onFavoritesTap: _openFavorites,
+      pageTitle: 'Home Screen',
+      showFab: false,
+      showSearch: false,
+      appBarActions: [
+        IconButton(
+          tooltip: 'Settings',
+          icon: const Icon(Icons.settings, size: 28),
+          onPressed: () => _soon('Settings'),
+        ),
+        const SizedBox(width: 8),
+      ],
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 96),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Welcome to PoxeDex',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Explore the world of Pokemon, view details, and save your favorites.',
-              style: TextStyle(color: colors.onSurfaceVariant),
-            ),
-            const SizedBox(height: 24),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.wb_sunny_outlined, color: colors.primary),
                 const SizedBox(width: 8),
@@ -130,26 +125,42 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             _buildDailyCard(colors),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
+            Text(
+              'Welcome to PoxeDex',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Explore the world of Pokemon, view details, and pick your favorites.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: colors.onSurfaceVariant),
+            ),
+            const SizedBox(height: 28),
             SizedBox(
               width: double.infinity,
               child: FilledButton.tonalIcon(
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const StadiumBorder(),
                 ),
                 onPressed: _openList,
                 icon: const Icon(Icons.grid_view_rounded),
                 label: const Text('View Pokemon List'),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const StadiumBorder(),
                 ),
                 onPressed: _openFavorites,
                 icon: const Icon(Icons.star_border),
@@ -196,11 +207,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final summary = PokemonSummary(id: detail.id, name: detail.name);
     final typeColor = TypeColors.of(detail.primaryType);
-    final background = Color.alphaBlend(typeColor.withAlpha(95), colors.surface);
+    final background =
+    Color.alphaBlend(typeColor.withAlpha(95), colors.surface);
 
-    return Material(
+    return Card(
+      margin: EdgeInsets.zero,
       color: background,
-      borderRadius: BorderRadius.circular(28),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _openDetail(detail),

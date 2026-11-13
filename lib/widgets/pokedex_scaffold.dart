@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'expandable_fab.dart';
 
 class PokedexScaffold extends StatefulWidget {
-  /// Teks pada row abu-abu di bawah AppBar (mis. "Home", "Daftar Pokemon").
+  /// Teks pada row di bawah AppBar (mis. "Home Screen", "Pokemon List").
   final String pageTitle;
   final Widget body;
 
   /// Set false kalau suatu halaman tidak butuh FAB.
   final bool showFab;
+
+  /// Set false untuk menyembunyikan ikon/kolom search di AppBar.
+  final bool showSearch;
+
+  /// Tombol tambahan di kanan AppBar (mis. ikon pengaturan).
+  final List<Widget>? appBarActions;
 
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
@@ -23,6 +30,8 @@ class PokedexScaffold extends StatefulWidget {
     required this.pageTitle,
     required this.body,
     this.showFab = true,
+    this.showSearch = true,
+    this.appBarActions,
     this.onSearchChanged,
     this.onSearchSubmitted,
     this.onSortTap,
@@ -35,6 +44,9 @@ class PokedexScaffold extends StatefulWidget {
 }
 
 class _PokedexScaffoldState extends State<PokedexScaffold> {
+  static const _navColor = Color(0xFF673AB7); // ungu AppBar
+  static const _navColorDark = Color(0xFF512DA8); // ungu row judul
+
   final _searchController = TextEditingController();
   bool _searching = false;
   bool _fabOpen = false;
@@ -89,8 +101,8 @@ class _PokedexScaffoldState extends State<PokedexScaffold> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final actions = _buildActions();
-    final showFab = widget.showFab && actions.isNotEmpty;
+    final fabActions = _buildActions();
+    final showFab = widget.showFab && fabActions.isNotEmpty;
 
     return PopScope(
       // Tombol back menutup search/menu FAB dulu sebelum keluar halaman
@@ -105,45 +117,54 @@ class _PokedexScaffoldState extends State<PokedexScaffold> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: colors.surface,
+          backgroundColor: _navColor,
+          foregroundColor: Colors.white,
           scrolledUnderElevation: 0,
+          systemOverlayStyle: SystemUiOverlayStyle.light,
           title: Row(
             children: [
               const Text(
-                'PoxeDex',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'PokeDex',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: _searching
-                      ? _buildSearchField(colors)
-                      : Align(
-                    key: const ValueKey('search-icon'),
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      tooltip: 'Search',
-                      icon: const Icon(Icons.search),
-                      onPressed: _openSearch,
+              if (widget.showSearch) ...[
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: _searching
+                        ? _buildSearchField(colors)
+                        : Align(
+                      key: const ValueKey('search-icon'),
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        tooltip: 'Search',
+                        icon: const Icon(Icons.search),
+                        onPressed: _openSearch,
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
+          actions: widget.appBarActions,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48),
             child: Container(
               width: double.infinity,
               height: 48,
-              color: colors.surfaceContainerHigh,
+              color: _navColorDark,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               alignment: Alignment.centerLeft,
               child: Text(
                 widget.pageTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -173,7 +194,7 @@ class _PokedexScaffoldState extends State<PokedexScaffold> {
                 child: ExpandableFab(
                   isOpen: _fabOpen,
                   onToggle: () => setState(() => _fabOpen = !_fabOpen),
-                  actions: actions,
+                  actions: fabActions,
                 ),
               ),
             ],
