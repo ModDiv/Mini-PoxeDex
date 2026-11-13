@@ -9,6 +9,7 @@ import '../widgets/pokemon_card.dart';
 import '../widgets/type_filter_sheet.dart';
 import 'favorite_screens.dart';
 import 'pokemon_detail_screen.dart';
+import '../widgets/skeleton_grid.dart';
 
 enum SortOption {
   idAsc('ID (low to high)'),
@@ -414,7 +415,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
         (_dataError == null && (_all == null || _missingTypeData));
 
     if (waiting) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonGrid();
     }
 
     if (_dataError != null) {
@@ -458,7 +459,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
   Widget _buildBody() {
     // Loading pertama
     if (_pokemons.isEmpty && _isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonGrid();
     }
 
     // Error pada load pertama

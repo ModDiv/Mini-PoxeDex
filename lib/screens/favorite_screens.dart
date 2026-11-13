@@ -7,6 +7,7 @@ import '../widgets/confirm_remove_dialog.dart';
 import '../widgets/pokedex_scaffold.dart';
 import '../widgets/pokemon_card.dart';
 import 'pokemon_detail_screen.dart';
+import '../widgets/skeleton_grid.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -88,7 +89,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonGrid();
     }
 
     if (_error != null) {

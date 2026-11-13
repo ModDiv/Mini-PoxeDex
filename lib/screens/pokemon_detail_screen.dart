@@ -1,13 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../models/pokemon_detail.dart';
 import '../models/pokemon_summary.dart';
 import '../services/favorite_service.dart';
 import '../services/pokeapi_service.dart';
 import '../utils/type_colors.dart';
-import '../widgets/rotating_pokeball.dart';
 import '../widgets/confirm_remove_dialog.dart';
+import '../widgets/rotating_pokeball.dart';
 
 class PokemonDetailScreen extends StatefulWidget {
   final PokemonSummary summary;
@@ -69,61 +70,6 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
     }
   }
 
-  Future<bool?> _confirmRemove() {
-    return showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        final colors = Theme.of(dialogContext).colorScheme;
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  size: 56,
-                  color: colors.error,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Remove this pokemon from favorite?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(dialogContext, false),
-                        child: const Text('Cancel'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colors.error,
-                          foregroundColor: colors.onError,
-                        ),
-                        onPressed: () => Navigator.pop(dialogContext, true),
-                        child: const Text('Yes'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   void _showMessage(String text) {
     if (!mounted) return;
     ScaffoldMessenger.of(context)
@@ -138,7 +84,6 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
     final colors = Theme.of(context).colorScheme;
     final detail = _detail;
 
-    // Sebelum data tiba, pakai warna netral; lalu beranimasi ke warna tipe utama
     final bg = detail == null
         ? colors.primaryContainer
         : TypeColors.of(detail.primaryType);
@@ -186,6 +131,7 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                fontFamily: 'Fredoka',
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: fg,
@@ -200,8 +146,6 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
                 tooltip: isFav ? 'Remove from favorites' : 'Add to favorites',
                 onPressed: _onFavoriteTap,
                 style: IconButton.styleFrom(
-                  // lingkaran putih agar bintang kuning tetap terlihat
-                  // di atas latar kuning (mis. tipe electric)
                   backgroundColor: isFav ? Colors.white.withAlpha(220) : null,
                 ),
                 icon: Icon(
@@ -250,6 +194,32 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
   }
 
   Widget _buildTypeChips(PokemonDetail? detail) {
+    // Kerangka chip saat data masih dimuat
+    if (detail == null && _loading) {
+      return SizedBox(
+        height: 34,
+        child: Shimmer.fromColors(
+          baseColor: Colors.white.withAlpha(90),
+          highlightColor: Colors.white.withAlpha(190),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < 2; i++)
+                Container(
+                  width: 96,
+                  height: 34,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return SizedBox(
       height: 34,
       child: detail == null
@@ -294,7 +264,11 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
             padding: EdgeInsets.only(top: 24, bottom: 8),
             child: Text(
               'Pokemon Details',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontFamily: 'Fredoka',
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           Expanded(child: _buildSheetContent(colors, detail)),
@@ -303,9 +277,73 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
     );
   }
 
+  /// Kerangka kotak Height/Weight dan paragraf deskripsi.
+  Widget _buildSheetSkeleton(ColorScheme colors) {
+    Widget block(double height, {double? width, double radius = 8}) {
+      return Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(radius),
+        ),
+      );
+    }
+
+    return Shimmer.fromColors(
+      baseColor: colors.surfaceContainerHigh,
+      highlightColor: colors.surfaceContainerLowest,
+      child: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      block(56, radius: 8),
+                      const SizedBox(height: 10),
+                      block(14, width: 50),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    children: [
+                      block(56, radius: 8),
+                      const SizedBox(height: 10),
+                      block(14, width: 50),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            block(14),
+            const SizedBox(height: 12),
+            block(14),
+            const SizedBox(height: 12),
+            block(14),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FractionallySizedBox(
+                widthFactor: 0.55,
+                child: block(14),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSheetContent(ColorScheme colors, PokemonDetail? detail) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return _buildSheetSkeleton(colors);
     }
 
     if (detail == null) {
@@ -317,8 +355,10 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
             children: [
               const Icon(Icons.wifi_off, size: 48),
               const SizedBox(height: 12),
-              Text(_error ?? 'Something went wrong.',
-                  textAlign: TextAlign.center),
+              Text(
+                _error ?? 'Something went wrong.',
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: _load,
