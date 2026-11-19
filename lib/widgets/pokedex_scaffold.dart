@@ -124,7 +124,7 @@ class _PokedexScaffoldState extends State<PokedexScaffold> {
           title: Row(
             children: [
               const Text(
-                'PokeDex',
+                'Mini PoxeDex',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
