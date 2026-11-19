@@ -13,6 +13,7 @@ import '../widgets/rotating_pokeball.dart';
 import 'favorite_screens.dart';
 import 'pokemon_detail_screen.dart';
 import 'pokemon_list_screen.dart';
+import '../widgets/about_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -102,14 +103,16 @@ class _HomeScreenState extends State<HomeScreen> {
       pageTitle: 'Home Screen',
       showFab: false,
       showSearch: false,
-      appBarActions: [
-        IconButton(
-          tooltip: 'Settings',
-          icon: const Icon(Icons.settings, size: 28),
-          onPressed: () => _soon('Settings'),
-        ),
-        const SizedBox(width: 8),
-      ],
+      
+    appBarActions: [
+      IconButton(
+        tooltip: 'Settings',
+        icon: const Icon(Icons.info_outline, size: 28),
+        onPressed: () => showAboutPoxeDex(context),
+      ),
+      const SizedBox(width: 8),
+    ],
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
         child: Column(
