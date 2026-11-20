@@ -247,10 +247,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: CachedNetworkImage(
                         imageUrl: summary.imageUrl,
                         fit: BoxFit.contain,
-                        placeholder: (_, __) => const Center(
+                        placeholder: (_, _) => const Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                        errorWidget: (_, __, ___) => Icon(
+                        errorWidget: (_, _, _) => Icon(
                           Icons.catching_pokemon,
                           size: 64,
                           color: colors.outline,

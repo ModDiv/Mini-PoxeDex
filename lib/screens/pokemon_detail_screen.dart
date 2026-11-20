@@ -177,10 +177,10 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
               child: CachedNetworkImage(
                 imageUrl: widget.summary.imageUrl,
                 fit: BoxFit.contain,
-                placeholder: (_, __) => const Center(
+                placeholder: (_, _) => const Center(
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
-                errorWidget: (_, __, ___) => const Icon(
+                errorWidget: (_, _, _) => const Icon(
                   Icons.catching_pokemon,
                   size: 64,
                   color: Colors.white70,

@@ -87,16 +87,18 @@ flutter_launcher_icons:
   min_sdk_android: 21
 
 flutter_native_splash:
-  color: "#C3BCE8"
-  image: "assets/icon/pokedex_icon_foreground.png"
-  color_dark: "#C3BCE8"
-  image_dark: "assets/icon/pokedex_icon_foreground.png"
+  color: "#FFFFFF"
+  image: assets/icon/pokedex_splash.png
+  color_dark: "#FFFFFF"
+  image_dark: assets/icon/pokedex_splash.png
   android_12:
-    color: "#C3BCE8"
-    image: "assets/icon/pokedex_icon_foreground.png"
-    color_dark: "#C3BCE8"
-    image_dark: "assets/icon/pokedex_icon_foreground.png"
+    color: "#FFFFFF"
+    image: assets/icon/pokedex_splash.png
+    color_dark: "#FFFFFF"
+    image_dark: assets/icon/pokedex_splash.png
 
+  # dart run flutter_launcher_icons
+  # dart run flutter_native_splash:create
 
   # To add assets to your application, add an assets section, like this:
   # assets:

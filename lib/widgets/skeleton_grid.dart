@@ -24,7 +24,7 @@ class SkeletonGrid extends StatelessWidget {
           childAspectRatio: 0.85,
         ),
         itemCount: itemCount,
-        itemBuilder: (_, __) => const _SkeletonCard(),
+        itemBuilder: (_, _) => const _SkeletonCard(),
       ),
     );
   }
